@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bozorlik Hisoblagichi</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header-card">
+            <div class="header-content">
+                <h1 class="header-title">
+                    <svg class="shopping-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h7M17 18a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm-8 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
+                    </svg>
+                    Bozorlik Hisoblagichi
+                </h1>
+                <p class="header-subtitle">Xaridlaringizni oson hisoblang</p>
+            </div>
+        </div>
+
+        <!-- Add Item Form -->
+        <div class="form-card">
+            <div class="card-header">
+                <h2 class="card-title" id="form-title">Yangi mahsulot qo'shish</h2>
+            </div>
+            <div class="card-content">
+                <div class="form-grid">
+                    <input type="text" id="name" placeholder="Mahsulot nomi" class="input">
+                    <input type="text" id="size" placeholder="Hajmi (kg/litr)" class="input">
+                    <input type="text" id="quantity" placeholder="Miqdor (dona)" class="input">
+                    <input type="number" id="price" placeholder="Narxi (so'm)" class="input">
+                </div>
+                <div class="button-group">
+                    <button id="add-btn" class="btn btn-primary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span id="add-btn-text">Qo'shish</span>
+                    </button>
+                    <button id="export-btn" class="btn btn-secondary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Eksport
+                    </button>
+                    <button id="clear-btn" class="btn btn-danger">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 4v6h6"/>
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                        </svg>
+                        Tozalash
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items List -->
+        <div class="list-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    Mahsulotlar ro'yxati
+                    <span class="badge" id="item-count">0 ta mahsulot</span>
+                </h2>
+            </div>
+            <div class="card-content">
+                <div id="empty-state" class="empty-state">
+                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h7M17 18a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm-8 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
+                    </svg>
+                    <p class="empty-title">Hozircha mahsulotlar yo'q</p>
+                    <p class="empty-subtitle">Yuqorida yangi mahsulot qo'shing</p>
+                </div>
+                <div id="items-table" class="table-container" style="display: none;">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Mahsulot</th>
+                                <th>Hajmi</th>
+                                <th>Miqdori</th>
+                                <th>Narxi</th>
+                                <th>Umumiy</th>
+                                <th>Amallar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="items-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total -->
+        <div class="total-card">
+            <div class="total-content">
+                <p class="total-label">Jami summa:</p>
+                <p class="total-amount" id="total-amount">0 so'm</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- avval jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- keyin app.js -->
+    <script src="app.js"></script>
+</body>
+</html>
