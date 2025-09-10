@@ -301,12 +301,13 @@ class ShoppingCalculator {
     });
 
     // 🔥 Watermark / Pechat qo'shish
-    doc.setFontSize(30);
-    doc.setTextColor(150, 150, 150); // kulrang
-    doc.text("Web Developer M.Mirzamatov", 105, 150, {
-      align: "center",
-      angle: 45, // qiya qilib yozish
-    });
+     const pageHeight = doc.internal.pageSize.height;
+     const pageWidth = doc.internal.pageSize.width;
+     doc.setFontSize(10);
+     doc.setTextColor(150); // kulrang rang
+     doc.text("Web Developer  M.Mirzamatov", pageWidth / 2, pageHeight - 10, {
+       align: "center",
+     });
 
     // PDF blob olish
     const pdfBlob = doc.output("blob");
