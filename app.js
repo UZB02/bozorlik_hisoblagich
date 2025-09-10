@@ -21,7 +21,9 @@ class ShoppingCalculator {
     document
       .getElementById("clear-btn")
       .addEventListener("click", () => this.clearAll());
-
+      document
+        .getElementById("share-btn")
+        .addEventListener("click", () => this.shareData());
     // Enter key support
     document.querySelectorAll(".input").forEach((input) => {
       input.addEventListener("keypress", (e) => {
@@ -197,7 +199,9 @@ class ShoppingCalculator {
     doc.text(`Yuklab olingan sana: ${dateStr}`, 20, 28);
 
     // Jadval ustunlari
-    const head = [["#", "Mahsulot", "Hajm(kg/litr)", "Miqdor(dona)", "Narx", "Umumiy"]];
+    const head = [
+      ["#", "Mahsulot", "Hajm(kg/litr)", "Miqdor(dona)", "Narx", "Umumiy"],
+    ];
 
     // Jadval ma'lumotlari
     const body = this.items.map((item, i) => [
@@ -241,6 +245,78 @@ class ShoppingCalculator {
     const filename = `bozorlik_${filenameDate}.pdf`;
 
     doc.save(filename);
+  }
+
+  shareData() {
+    if (this.items.length === 0) {
+      alert("Ulashish uchun mahsulotlar qo'shing!");
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const now = new Date();
+    const dateStr = now.toLocaleString("uz-UZ");
+
+    doc.setFontSize(16);
+    doc.text("Bozorlik Ro'yxati", 20, 20);
+    doc.setFontSize(10);
+    doc.text(`Yuklab olingan sana: ${dateStr}`, 20, 28);
+
+    const head = [["#", "Mahsulot", "Hajm", "Miqdor", "Narx", "Umumiy"]];
+    const body = this.items.map((item, i) => [
+      i + 1,
+      item.name || "-",
+      item.size || "-",
+      item.quantity || "-",
+      this.formatCurrency(item.price),
+      this.formatCurrency(this.calculateItemTotal(item)),
+    ]);
+    body.push([
+      {
+        content: "Jami",
+        colSpan: 5,
+        styles: { halign: "right", fontStyle: "bold" },
+      },
+      this.formatCurrency(this.calculateTotal()),
+    ]);
+
+    doc.autoTable({
+      startY: 40,
+      head: head,
+      body: body,
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [41, 128, 185] },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+    });
+
+    // PDF blob olish
+    const pdfBlob = doc.output("blob");
+
+    const pad = (n) => String(n).padStart(2, "0");
+    const year = now.getFullYear();
+    const month = pad(now.getMonth() + 1);
+    const day = pad(now.getDate());
+    const hours = pad(now.getHours());
+    const minutes = pad(now.getMinutes());
+
+    const filenameDate = `${year}-${month}-${day}_${hours}:${minutes}`;
+    const filename = `bozorlik_${filenameDate}.pdf`;
+
+    const file = new File([pdfBlob], filename, { type: "application/pdf" });
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Bozorlik Ro'yxati",
+          text: "Mana mening bozorlik ro'yxatim 📋",
+          files: [file],
+        })
+        .catch((err) => console.log("Ulashishda xato:", err));
+    } else {
+      alert("Sizning qurilmangiz ulashishni qo'llab-quvvatlamaydi!");
+    }
   }
 }
 

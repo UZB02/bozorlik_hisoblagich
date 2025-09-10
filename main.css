@@ -118,6 +118,10 @@ body {
   gap: 0.75rem;
 }
 
+#share-btn{
+  display: none;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -312,7 +316,9 @@ body {
     flex-direction: column;
     gap: 0.5rem;
   }
-
+  #share-btn{
+  display: block;
+}
   .btn {
     justify-content: center;
     padding: 1rem;
@@ -364,7 +370,9 @@ body {
   .card-content {
     padding: 1rem;
   }
-
+    #share-btn{
+  display: block;
+}
   .header-content {
     padding: 1rem;
   }
@@ -410,7 +418,9 @@ body {
   .btn:hover {
     transform: scale(0.98);
   }
-
+  #share-btn{
+  display: block;
+}
   .items-table tr:hover {
     background: transparent;
   }
