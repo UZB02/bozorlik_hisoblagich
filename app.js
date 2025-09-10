@@ -196,26 +196,38 @@ class ShoppingCalculator {
     doc.setFontSize(10);
     doc.text(`Yuklab olingan sana: ${dateStr}`, 20, 28);
 
-    doc.setFontSize(12);
-    let y = 40;
-    this.items.forEach((item, i) => {
-      const itemTotal = this.calculateItemTotal(item);
-      const line = `${i + 1}. ${item.name} | Hajm: ${
-        item.size || "-"
-      } | Miqdor: ${item.quantity || "-"} | Narx: ${this.formatCurrency(
-        item.price
-      )} | Umumiy: ${this.formatCurrency(itemTotal)}`;
-      doc.text(line, 20, y);
-      y += 8;
-      if (y > 270) {
-        doc.addPage();
-        y = 20;
-      }
-    });
+    // Jadval ustunlari
+    const head = [["#", "Mahsulot", "Hajm(kg/litr)", "Miqdor(dona)", "Narx", "Umumiy"]];
 
-    y += 10;
-    doc.setFontSize(14);
-    doc.text(`Jami: ${this.formatCurrency(this.calculateTotal())}`, 20, y);
+    // Jadval ma'lumotlari
+    const body = this.items.map((item, i) => [
+      i + 1,
+      item.name || "-",
+      item.size || "-",
+      item.quantity || "-",
+      this.formatCurrency(item.price),
+      this.formatCurrency(this.calculateItemTotal(item)),
+    ]);
+
+    // Jami qatorini qo‘shish
+    body.push([
+      {
+        content: "Jami",
+        colSpan: 5,
+        styles: { halign: "right", fontStyle: "bold" },
+      },
+      this.formatCurrency(this.calculateTotal()),
+    ]);
+
+    // Jadvalni chizish
+    doc.autoTable({
+      startY: 40,
+      head: head,
+      body: body,
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [41, 128, 185] }, // ko‘k sarlavha
+      alternateRowStyles: { fillColor: [245, 245, 245] }, // almashib turadigan rang
+    });
 
     // Fayl nomini 24 soatlik formatda chiqarish (YYYY-MM-DD_HH:mm)
     const pad = (n) => String(n).padStart(2, "0");
