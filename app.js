@@ -82,7 +82,7 @@ class ShoppingCalculator {
     if (this.editIndex >= 0) {
       this.items[this.editIndex] = newItem;
     } else {
-      this.items.push(newItem);
+      this.items.unshift(newItem);
     }
 
     this.saveToStorage();
