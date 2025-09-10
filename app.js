@@ -21,9 +21,9 @@ class ShoppingCalculator {
     document
       .getElementById("clear-btn")
       .addEventListener("click", () => this.clearAll());
-      document
-        .getElementById("share-btn")
-        .addEventListener("click", () => this.shareData());
+    document
+      .getElementById("share-btn")
+      .addEventListener("click", () => this.shareData());
     // Enter key support
     document.querySelectorAll(".input").forEach((input) => {
       input.addEventListener("keypress", (e) => {
@@ -233,6 +233,15 @@ class ShoppingCalculator {
       alternateRowStyles: { fillColor: [245, 245, 245] }, // almashib turadigan rang
     });
 
+    // === P E C H A T ===
+    const pageHeight = doc.internal.pageSize.height;
+    const pageWidth = doc.internal.pageSize.width;
+    doc.setFontSize(10);
+    doc.setTextColor(150); // kulrang rang
+    doc.text("Web Developer  M.Mirzamatov", pageWidth / 2, pageHeight - 10, {
+      align: "center",
+    });
+
     // Fayl nomini 24 soatlik formatda chiqarish (YYYY-MM-DD_HH:mm)
     const pad = (n) => String(n).padStart(2, "0");
     const year = now.getFullYear();
@@ -291,6 +300,14 @@ class ShoppingCalculator {
       alternateRowStyles: { fillColor: [245, 245, 245] },
     });
 
+    // 🔥 Watermark / Pechat qo'shish
+    doc.setFontSize(30);
+    doc.setTextColor(150, 150, 150); // kulrang
+    doc.text("Web Developer M.Mirzamatov", 105, 150, {
+      align: "center",
+      angle: 45, // qiya qilib yozish
+    });
+
     // PDF blob olish
     const pdfBlob = doc.output("blob");
 
@@ -306,7 +323,11 @@ class ShoppingCalculator {
 
     const file = new File([pdfBlob], filename, { type: "application/pdf" });
 
-    if (navigator.share) {
+    if (
+      navigator.share &&
+      navigator.canShare &&
+      navigator.canShare({ files: [file] })
+    ) {
       navigator
         .share({
           title: "Bozorlik Ro'yxati",
@@ -315,7 +336,14 @@ class ShoppingCalculator {
         })
         .catch((err) => console.log("Ulashishda xato:", err));
     } else {
-      alert("Sizning qurilmangiz ulashishni qo'llab-quvvatlamaydi!");
+      // fallback: yuklab olish
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      alert("Ulashish qo'llab-quvvatlanmadi, fayl yuklab olindi!");
     }
   }
 }
