@@ -290,6 +290,27 @@ body {
   color: #059669;
 }
 
+.balance-card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.balance-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-direction: column;
+}
+
+.balance-info {
+  font-size: 16px;
+  margin: 5px 0;
+}
+
+
 /* Responsive design */
 @media (max-width: 768px) {
   body {

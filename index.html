@@ -34,6 +34,38 @@
           <p class="header-subtitle">Xaridlaringizni oson hisoblang</p>
         </div>
       </div>
+     <!-- Balance Section -->
+<div class="balance-card">
+  <div class="card-header">
+    <h2 class="card-title">Balans</h2>
+  </div>
+  <div class="card-content">
+    <div class="balance-input-group" id="balance-input-group">
+      <input
+        type="number"
+        id="balance-input"
+        placeholder="Balans kiriting (so'm)"
+        class="input"
+      />
+      <button id="set-balance-btn" class="btn btn-primary">
+        Saqlash
+      </button>
+    </div>
+
+    <div class="balance-display" id="balance-display">
+      <p class="balance-info">
+        Kiritilgan balans: <span id="current-balance">0 so'm</span>
+      </p>
+      <p class="balance-info">
+        Qolgan mablag': <span id="remaining-balance">0 so'm</span>
+      </p>
+      <button id="edit-balance-btn" class="btn btn-secondary btn-sm">
+        Tahrirlash
+      </button>
+    </div>
+  </div>
+</div>
+
 
       <!-- Add Item Form -->
       <div class="form-card">
@@ -43,11 +75,23 @@
         <div class="card-content">
           <div class="form-grid">
             <input
-              type="text"
+              list="products"
               id="name"
-              placeholder="Mahsulot nomi"
               class="input"
+              placeholder="Mahsulot nomi"
             />
+            <datalist id="products">
+              <option value="Kartoshka"></option>
+              <option value="Piyoz"></option>
+              <option value="Sabzi"></option>
+              <option value="Yog‘"></option>
+              <option value="Go‘sht"></option>
+              <option value="Tovuq go'shti"></option>
+              <option value="Non"></option>
+              <option value="Sut"></option>
+              <option value="Olma"></option>
+            </datalist>
+
             <input
               type="number"
               id="size"
