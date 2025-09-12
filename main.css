@@ -34,12 +34,20 @@ body {
 }
 
 .header-card {
-  background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(16, 185, 129, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(5, 150, 105, 0.1),
+    rgba(16, 185, 129, 0.1)
+  );
   border-color: rgba(5, 150, 105, 0.2);
 }
 
 .total-card {
-  background: linear-gradient(135deg, rgba(5, 150, 105, 0.05), rgba(16, 185, 129, 0.05));
+  background: linear-gradient(
+    135deg,
+    rgba(5, 150, 105, 0.05),
+    rgba(16, 185, 129, 0.05)
+  );
   border-color: rgba(5, 150, 105, 0.2);
 }
 
@@ -118,7 +126,7 @@ body {
   gap: 0.75rem;
 }
 
-#share-btn{
+#share-btn {
   display: none;
 }
 
@@ -295,7 +303,7 @@ body {
   padding: 15px;
   border-radius: 10px;
   margin: 15px 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .balance-input-group {
@@ -309,7 +317,6 @@ body {
   font-size: 16px;
   margin: 5px 0;
 }
-
 
 /* Responsive design */
 @media (max-width: 768px) {
@@ -337,9 +344,9 @@ body {
     flex-direction: column;
     gap: 0.5rem;
   }
-  #share-btn{
-  display: block;
-}
+  #share-btn {
+    display: block;
+  }
   .btn {
     justify-content: center;
     padding: 1rem;
@@ -391,9 +398,9 @@ body {
   .card-content {
     padding: 1rem;
   }
-    #share-btn{
-  display: block;
-}
+  #share-btn {
+    display: block;
+  }
   .header-content {
     padding: 1rem;
   }
@@ -439,9 +446,9 @@ body {
   .btn:hover {
     transform: scale(0.98);
   }
-  #share-btn{
-  display: block;
-}
+  #share-btn {
+    display: block;
+  }
   .items-table tr:hover {
     background: transparent;
   }
