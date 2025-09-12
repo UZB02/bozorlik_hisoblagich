@@ -465,7 +465,6 @@ class ShoppingCalculator {
 
     doc.setFontSize(12);
     doc.text(`Balans: ${this.formatCurrency(this.balance)}`, 20, finalY + 10);
-    doc.text(`Jami xarajat: ${this.formatCurrency(total)}`, 20, finalY + 18);
   if (remaining >= 0) {
     doc.text(
       `Balansdan qaytkan summa: ${this.formatCurrency(remaining)}`,
