@@ -456,24 +456,24 @@ class ShoppingCalculator {
     }
 
     // 🔥 Jadval tugagach balans ma'lumotlari
-    // const total = this.calculateTotal();
-    // const remaining = (this.balance || 0) - total;
+    const total = this.calculateTotal();
+    const remaining = (this.balance || 0) - total;
 
-    // doc.setFontSize(12);
-    // doc.text(`Balans: ${this.formatCurrency(this.balance)}`, 20, finalY + 10);
-    // if (remaining >= 0) {
-    //   doc.text(
-    //     `Balansdan qaytkan summa: ${this.formatCurrency(remaining)}`,
-    //     20,
-    //     finalY + 18
-    //   );
-    // } else {
-    //   doc.text(
-    //     `Balansdan tashqari xarajat: ${this.formatCurrency(remaining)}`,
-    //     20,
-    //     finalY + 18
-    //   );
-    // }
+    doc.setFontSize(12);
+    doc.text(`Balans: ${this.formatCurrency(this.balance)}`, 20, finalY + 10);
+    if (remaining >= 0) {
+      doc.text(
+        `Balansdan qaytkan summa: ${this.formatCurrency(remaining)}`,
+        20,
+        finalY + 18
+      );
+    } else {
+      doc.text(
+        `Balansdan tashqari xarajat: ${this.formatCurrency(remaining)}`,
+        20,
+        finalY + 18
+      );
+    }
 
     const pageHeight = doc.internal.pageSize.height;
     const pageWidth = doc.internal.pageSize.width;

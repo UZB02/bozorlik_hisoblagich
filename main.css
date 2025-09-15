@@ -315,8 +315,28 @@ body {
 
 .balance-info {
   font-size: 16px;
-  margin: 5px 0;
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #f5f5f5;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
+
+/* Agar 2 ta element bo‘lsa, ularni rangini farqlash */
+.balance-info:nth-child(1) {
+   background: linear-gradient(
+    135deg,
+    rgba(5, 150, 105, 0.05),
+    rgba(16, 185, 129, 0.05)
+  );
+  border-color: rgba(5, 150, 105, 0.2); /* och ko‘k rang */
+}
+
+.balance-info:nth-child(2) {
+  background-color: #fff3e0; /* och to‘q sariq rang */
+}
+
 
 /* Responsive design */
 @media (max-width: 768px) {
