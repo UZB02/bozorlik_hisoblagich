@@ -106,11 +106,17 @@ class ShoppingCalculator {
   }
 
   getFormData() {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const year = now.getFullYear();
+    const formattedDate = `${day}.${month}.${year}`; // faqat sana (kun.oy.yil)
     return {
       name: document.getElementById("name").value.trim(),
       size: document.getElementById("size").value.trim(),
       quantity: document.getElementById("quantity").value.trim(),
       price: document.getElementById("price").value.trim(),
+      addedAt: formattedDate,
     };
   }
 
@@ -146,9 +152,12 @@ class ShoppingCalculator {
       size: formData.size || "",
       quantity: formData.quantity || "",
       price: priceNum,
+      addedAt: formData.addedAt,
     };
 
     if (this.editIndex >= 0) {
+      // Eski vaqtni saqlaymiz
+      newItem.addedAt = this.items[this.editIndex].addedAt || formData.addedAt;
       this.items[this.editIndex] = newItem;
     } else {
       this.items.unshift(newItem);
@@ -236,22 +245,23 @@ class ShoppingCalculator {
         const itemTotal = this.calculateItemTotal(item);
 
         row.innerHTML = `
-          <td><strong>${this.escapeHtml(item.name)}</strong></td>
-          <td style="text-align: center;">${
-            this.escapeHtml(item.size) || "-"
-          }</td>
-          <td style="text-align: center;">${
-            this.escapeHtml(item.quantity) || "-"
-          }</td>
-          <td style="text-align: center;">${this.formatCurrency(
-            item.price
-          )}</td>
-          <td style="text-align: center;">${this.formatCurrency(itemTotal)}</td>
-          <td style="text-align: center;">
-            <button class="edit-btn" data-index="${index}">✏️</button>
-            <button class="delete-btn" data-index="${index}">🗑️</button>
-          </td>
-        `;
+        <td><strong>${this.escapeHtml(item.name)}</strong></td>
+        <td style="text-align: center;">${
+          this.escapeHtml(item.size) || "-"
+        }</td>
+        <td style="text-align: center;">${
+          this.escapeHtml(item.quantity) || "-"
+        }</td>
+        <td style="text-align: center;">${this.formatCurrency(item.price)}</td>
+        <td style="text-align: center;">${this.formatCurrency(itemTotal)}</td>
+        <td style="text-align: center;">${
+          item.addedAt || "-"
+        }</td> <!-- 🕒 vaqt -->
+        <td style="text-align: center;">
+          <button class="edit-btn" data-index="${index}">✏️</button>
+          <button class="delete-btn" data-index="${index}">🗑️</button>
+        </td>
+      `;
         tbody.appendChild(row);
       });
 
@@ -262,6 +272,7 @@ class ShoppingCalculator {
             this.editItem(Number(btn.getAttribute("data-index")))
           )
         );
+
       tbody
         .querySelectorAll(".delete-btn")
         .forEach((btn) =>
