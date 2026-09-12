@@ -1,14 +1,18 @@
-class ShoppingCalculator {
+class CartManager {
   constructor() {
-    this.items = [];
+    this.carts = [];
+    this.currentCartId = null;
     this.editIndex = -1;
-    this.balance = 0;
     this.init();
   }
 
   init() {
     this.loadFromStorage();
+    if (this.carts.length === 0) {
+      this.createCart("Bozor 1");
+    }
     this.bindEvents();
+    this.updateCartSelector();
     this.updateDisplay();
     this.updateBalanceUI();
   }
@@ -20,6 +24,9 @@ class ShoppingCalculator {
     const shareBtn = document.getElementById("share-btn");
     const setBalanceBtn = document.getElementById("set-balance-btn");
     const editBalanceBtn = document.getElementById("edit-balance-btn");
+    const newCartBtn = document.getElementById("new-cart-btn");
+    const cartSelector = document.getElementById("cart-selector");
+    const deleteCartBtn = document.getElementById("delete-cart-btn");
 
     if (addBtn) addBtn.addEventListener("click", () => this.addItem());
     if (exportBtn) exportBtn.addEventListener("click", () => this.exportData());
@@ -35,6 +42,19 @@ class ShoppingCalculator {
     if (editBalanceBtn)
       editBalanceBtn.addEventListener("click", () => this.enableBalanceEdit());
 
+    if (newCartBtn)
+      newCartBtn.addEventListener("click", () => this.showNewCartDialog());
+
+    if (deleteCartBtn)
+      deleteCartBtn.addEventListener("click", () =>
+        this.showDeleteCartDialog(),
+      );
+
+    if (cartSelector)
+      cartSelector.addEventListener("change", (e) =>
+        this.switchCart(e.target.value),
+      );
+
     // Enter key support for inputs with class "input"
     document.querySelectorAll(".input").forEach((input) => {
       input.addEventListener("keypress", (e) => {
@@ -44,22 +64,145 @@ class ShoppingCalculator {
   }
 
   loadFromStorage() {
-    const saved = localStorage.getItem("bozorlik");
+    const saved = localStorage.getItem("bozorlik_carts");
     if (saved) {
       try {
-        this.items = JSON.parse(saved);
+        this.carts = JSON.parse(saved);
       } catch (e) {
-        this.items = [];
+        this.carts = [];
       }
     }
 
-    const savedBalance = localStorage.getItem("bozorlik_balance");
-    if (savedBalance !== null) {
-      const b = parseFloat(savedBalance);
-      this.balance = isNaN(b) ? 0 : b;
+    const savedCurrentId = localStorage.getItem("bozorlik_current_cart");
+    if (savedCurrentId && this.carts.find((c) => c.id === savedCurrentId)) {
+      this.currentCartId = savedCurrentId;
+    } else if (this.carts.length > 0) {
+      this.currentCartId = this.carts[0].id;
     }
 
-    // 🔹 Balans UI ni to‘g‘ri ko‘rsatish
+    this.updateBalanceUIVisibility();
+  }
+
+  saveToStorage() {
+    localStorage.setItem("bozorlik_carts", JSON.stringify(this.carts));
+    localStorage.setItem("bozorlik_current_cart", this.currentCartId);
+  }
+
+  getCurrentCart() {
+    return this.carts.find((c) => c.id === this.currentCartId);
+  }
+
+  get items() {
+    const cart = this.getCurrentCart();
+    return cart ? cart.items : [];
+  }
+
+  get balance() {
+    const cart = this.getCurrentCart();
+    return cart ? cart.balance : 0;
+  }
+
+  createCart(name) {
+    const cartId =
+      "cart_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+    const cart = {
+      id: cartId,
+      name: name || "Yangi Savat",
+      balance: 0,
+      items: [],
+    };
+    this.carts.push(cart);
+    this.currentCartId = cartId;
+    this.saveToStorage();
+    return cart;
+  }
+
+  switchCart(cartId) {
+    if (this.carts.find((c) => c.id === cartId)) {
+      this.currentCartId = cartId;
+      this.saveToStorage();
+      this.clearForm();
+      this.editIndex = -1;
+      this.updateDisplay();
+      this.updateBalanceUI();
+      this.updateBalanceUIVisibility();
+      this.updateCartSelector();
+    }
+  }
+
+  deleteCart(cartId) {
+    if (this.carts.length <= 1) {
+      alert("Aqal-aqalli bitta savat bo'lishi kerak!");
+      return false;
+    }
+    const index = this.carts.findIndex((c) => c.id === cartId);
+    if (index > -1) {
+      this.carts.splice(index, 1);
+      if (this.currentCartId === cartId) {
+        this.currentCartId = this.carts[0].id;
+      }
+      this.saveToStorage();
+      this.updateCartSelector();
+      this.updateDisplay();
+      this.updateBalanceUI();
+      this.updateBalanceUIVisibility();
+      return true;
+    }
+    return false;
+  }
+
+  renameCart(cartId, newName) {
+    const cart = this.carts.find((c) => c.id === cartId);
+    if (cart) {
+      cart.name = newName.trim() || "Yangi Savat";
+      this.saveToStorage();
+      this.updateCartSelector();
+    }
+  }
+
+  updateCartSelector() {
+    const selector = document.getElementById("cart-selector");
+    if (!selector) return;
+
+    selector.innerHTML = "";
+    this.carts.forEach((cart) => {
+      const option = document.createElement("option");
+      option.value = cart.id;
+      option.textContent = cart.name + ` (${cart.items.length} ta)`;
+      if (cart.id === this.currentCartId) {
+        option.selected = true;
+      }
+      selector.appendChild(option);
+    });
+  }
+
+  showNewCartDialog() {
+    const cartName = prompt("Savatning nomini kiriting:", "Yangi Savat");
+    if (cartName !== null) {
+      this.createCart(cartName);
+      this.updateCartSelector();
+      this.updateDisplay();
+      this.updateBalanceUI();
+      this.updateBalanceUIVisibility();
+    }
+  }
+
+  showDeleteCartDialog() {
+    if (this.carts.length <= 1) {
+      alert("Aqal-aqalli bitta savat bo'lishi kerak!");
+      return;
+    }
+
+    const cart = this.getCurrentCart();
+    if (cart && confirm(`"${cart.name}" savatni o'chirishni xohlaysizmi?`)) {
+      this.deleteCart(cart.id);
+      this.updateDisplay();
+      this.updateBalanceUI();
+      this.updateBalanceUIVisibility();
+    }
+  }
+
+  updateBalanceUIVisibility() {
     const inputGroup = document.getElementById("balance-input-group");
     const displayGroup = document.getElementById("balance-display");
 
@@ -72,24 +215,16 @@ class ShoppingCalculator {
     }
   }
 
-  saveToStorage() {
-    localStorage.setItem("bozorlik", JSON.stringify(this.items));
-    localStorage.setItem("bozorlik_balance", String(this.balance));
-  }
-
   setBalance(value) {
-    this.balance = value;
-    this.saveToStorage();
-    this.updateBalanceUI();
-
-    // 🔹 Inputni yashirish, displayni ko‘rsatish
-    const inputGroup = document.getElementById("balance-input-group");
-    const displayGroup = document.getElementById("balance-display");
-    if (inputGroup) inputGroup.style.display = "none";
-    if (displayGroup) displayGroup.style.display = "block";
+    const cart = this.getCurrentCart();
+    if (cart) {
+      cart.balance = value;
+      this.saveToStorage();
+      this.updateBalanceUI();
+      this.updateBalanceUIVisibility();
+    }
   }
 
-  // 🔥 Balansni tahrirlash rejimi
   enableBalanceEdit() {
     const input = document.getElementById("balance-input");
     if (input) input.value = this.balance;
@@ -110,7 +245,7 @@ class ShoppingCalculator {
     const day = String(now.getDate()).padStart(2, "0");
     const month = String(now.getMonth() + 1).padStart(2, "0");
     const year = now.getFullYear();
-    const formattedDate = `${day}.${month}.${year}`; // faqat sana (kun.oy.yil)
+    const formattedDate = `${day}.${month}.${year}`;
     return {
       name: document.getElementById("name").value.trim(),
       size: document.getElementById("size").value.trim(),
@@ -147,6 +282,9 @@ class ShoppingCalculator {
       return;
     }
 
+    const cart = this.getCurrentCart();
+    if (!cart) return;
+
     const newItem = {
       name: formData.name,
       size: formData.size || "",
@@ -156,22 +294,26 @@ class ShoppingCalculator {
     };
 
     if (this.editIndex >= 0) {
-      // Eski vaqtni saqlaymiz
-      newItem.addedAt = this.items[this.editIndex].addedAt || formData.addedAt;
-      this.items[this.editIndex] = newItem;
+      newItem.addedAt = cart.items[this.editIndex].addedAt || formData.addedAt;
+      cart.items[this.editIndex] = newItem;
     } else {
-      this.items.unshift(newItem);
+      cart.items.unshift(newItem);
     }
 
     this.saveToStorage();
     this.clearForm();
     this.updateDisplay();
     this.updateBalanceUI();
+    this.updateCartSelector();
   }
 
   editItem(index) {
-    const item = this.items[index];
+    const cart = this.getCurrentCart();
+    if (!cart) return;
+
+    const item = cart.items[index];
     if (!item) return;
+
     const nameEl = document.getElementById("name");
     const sizeEl = document.getElementById("size");
     const qtyEl = document.getElementById("quantity");
@@ -193,14 +335,19 @@ class ShoppingCalculator {
   }
 
   deleteItem(index) {
-    if (!this.items[index]) return;
+    const cart = this.getCurrentCart();
+    if (!cart) return;
+
+    if (!cart.items[index]) return;
     if (confirm("Bu mahsulotni o'chirishni xohlaysizmi?")) {
-      this.items.splice(index, 1);
+      cart.items.splice(index, 1);
       if (this.editIndex === index) this.clearForm();
       else if (this.editIndex > index) this.editIndex--;
       this.saveToStorage();
       this.updateDisplay();
       this.updateBalanceUI();
+      this.updateBalanceUIVisibility();
+      this.updateCartSelector();
     }
   }
 
@@ -217,7 +364,7 @@ class ShoppingCalculator {
   calculateTotal() {
     return this.items.reduce(
       (sum, item) => sum + this.calculateItemTotal(item),
-      0
+      0,
     );
   }
 
@@ -254,9 +401,7 @@ class ShoppingCalculator {
         }</td>
         <td style="text-align: center;">${this.formatCurrency(item.price)}</td>
         <td style="text-align: center;">${this.formatCurrency(itemTotal)}</td>
-        <td style="text-align: center;">${
-          item.addedAt || "-"
-        }</td> <!-- 🕒 vaqt -->
+        <td style="text-align: center;">${item.addedAt || "-"}</td>
         <td style="text-align: center;">
           <button class="edit-btn" data-index="${index}">✏️</button>
           <button class="delete-btn" data-index="${index}">🗑️</button>
@@ -269,16 +414,16 @@ class ShoppingCalculator {
         .querySelectorAll(".edit-btn")
         .forEach((btn) =>
           btn.addEventListener("click", () =>
-            this.editItem(Number(btn.getAttribute("data-index")))
-          )
+            this.editItem(Number(btn.getAttribute("data-index"))),
+          ),
         );
 
       tbody
         .querySelectorAll(".delete-btn")
         .forEach((btn) =>
           btn.addEventListener("click", () =>
-            this.deleteItem(Number(btn.getAttribute("data-index")))
-          )
+            this.deleteItem(Number(btn.getAttribute("data-index"))),
+          ),
         );
     }
 
@@ -297,31 +442,36 @@ class ShoppingCalculator {
   }
 
   clearAll() {
+    const cart = this.getCurrentCart();
+    if (!cart) return;
+
     if (confirm("Haqiqatan ham barcha ma'lumotlarni tozalashni xohlaysizmi?")) {
-      this.items = [];
+      cart.items = [];
       this.editIndex = -1;
-      localStorage.removeItem("bozorlik");
+      this.saveToStorage();
       this.clearForm();
       this.updateDisplay();
       this.updateBalanceUI();
+      this.updateBalanceUIVisibility();
+      this.updateCartSelector();
     }
   }
 
-  // 🔹 Export va share funksiyalari o‘zgarmagan (siz yozganidek qoldi)
   exportData() {
     if (this.items.length === 0) {
       alert("Eksport qilish uchun mahsulotlar qo'shing!");
       return;
     }
 
-    const { jsPDF } = window.jspdf; // kutubxona yuklangan bo'lishi kerak
+    const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
     const now = new Date();
     const dateStr = now.toLocaleString("uz-UZ");
+    const cart = this.getCurrentCart();
 
     doc.setFontSize(16);
-    doc.text("Bozorlik Ro'yxati", 20, 20);
+    doc.text(cart.name + " - Bozorlik Ro'yxati", 20, 20);
 
     doc.setFontSize(10);
     doc.text(`Yuklab olingan sana: ${dateStr}`, 20, 28);
@@ -339,7 +489,6 @@ class ShoppingCalculator {
       this.formatCurrency(this.calculateItemTotal(item)),
     ]);
 
-    // jami qatori
     body.push([
       {
         content: "Jami",
@@ -359,9 +508,8 @@ class ShoppingCalculator {
         headStyles: { fillColor: [41, 128, 185] },
         alternateRowStyles: { fillColor: [245, 245, 245] },
       });
-      finalY = doc.lastAutoTable.finalY; // jadval tugagan joy
+      finalY = doc.lastAutoTable.finalY;
     } else {
-      // Agar autoTable yo'q bo'lsa, sodda ro'yxat
       let y = 40;
       body.forEach((r) => {
         doc.text(r.join(" | "), 20, y);
@@ -370,27 +518,6 @@ class ShoppingCalculator {
       finalY = y;
     }
 
-    // 🔥 Jadvaldan keyin balans ma'lumotlari
-    // const total = this.calculateTotal();
-    // const remaining = (this.balance || 0) - total;
-    // doc.setFontSize(10);
-    // doc.setTextColor(150);
-    // doc.text(`Balans: ${this.formatCurrency(this.balance)}`, 20, finalY + 10);
-    // if (remaining >= 0) {
-    //   doc.text(
-    //     `Balansdan qaytkan summa: ${this.formatCurrency(remaining)}`,
-    //     20,
-    //     finalY + 18
-    //   );
-    // } else {
-    //   doc.text(
-    //     `Balansdan tashqari xarajat: ${this.formatCurrency(remaining)}`,
-    //     20,
-    //     finalY + 18
-    //   );
-    // }
-
-    // Pechat / watermark
     const pageHeight = doc.internal.pageSize.height;
     const pageWidth = doc.internal.pageSize.width;
     doc.setFontSize(10);
@@ -399,7 +526,6 @@ class ShoppingCalculator {
       align: "center",
     });
 
-    // filename: YYYY-MM-DD_HHmm
     const pad = (n) => String(n).padStart(2, "0");
     const year = now.getFullYear();
     const month = pad(now.getMonth() + 1);
@@ -411,6 +537,7 @@ class ShoppingCalculator {
 
     doc.save(filename);
   }
+
   shareData() {
     if (this.items.length === 0) {
       alert("Ulashish uchun mahsulotlar qo'shing!");
@@ -422,9 +549,10 @@ class ShoppingCalculator {
 
     const now = new Date();
     const dateStr = now.toLocaleString("uz-UZ");
+    const cart = this.getCurrentCart();
 
     doc.setFontSize(16);
-    doc.text("Bozorlik Ro'yxati", 20, 20);
+    doc.text(cart.name + " - Bozorlik Ro'yxati", 20, 20);
     doc.setFontSize(10);
     doc.text(`Yuklab olingan sana: ${dateStr}`, 20, 28);
 
@@ -456,7 +584,7 @@ class ShoppingCalculator {
         headStyles: { fillColor: [41, 128, 185] },
         alternateRowStyles: { fillColor: [245, 245, 245] },
       });
-      finalY = doc.lastAutoTable.finalY; // 📌 Jadval tugagan joy
+      finalY = doc.lastAutoTable.finalY;
     } else {
       let y = 40;
       body.forEach((r) => {
@@ -466,7 +594,6 @@ class ShoppingCalculator {
       finalY = y;
     }
 
-    // 🔥 Jadval tugagach balans ma'lumotlari
     const total = this.calculateTotal();
     const remaining = (this.balance || 0) - total;
 
@@ -476,13 +603,13 @@ class ShoppingCalculator {
       doc.text(
         `Balansdan qaytkan summa: ${this.formatCurrency(remaining)}`,
         20,
-        finalY + 18
+        finalY + 18,
       );
     } else {
       doc.text(
         `Balansdan tashqari xarajat: ${this.formatCurrency(remaining)}`,
         20,
-        finalY + 18
+        finalY + 18,
       );
     }
 
@@ -514,7 +641,7 @@ class ShoppingCalculator {
     ) {
       navigator
         .share({
-          title: "Bozorlik Ro'yxati",
+          title: cart.name + " - Bozorlik Ro'yxati",
           text: "Mana mening bozorlik ro'yxatim 📋",
           files: [file],
         })
@@ -560,4 +687,4 @@ class ShoppingCalculator {
 }
 
 // Instansiya yaratish
-window.calculator = new ShoppingCalculator();
+window.cartManager = new CartManager();
